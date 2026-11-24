@@ -27,7 +27,7 @@ app.post("/webhook", (req, res) => {
   const from = message.from;
   const text = message.text?.body;
   console.log(`Message from ${from}: ${text}`);
-  if (text) sendText(from, getReply(text));
+  if (text) sendText(from, getReply(from, text));
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

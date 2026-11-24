@@ -8,6 +8,8 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
+const paused = new Set();
+app.get("/", (req, res) => res.send("OK"));
 
 app.get("/webhook", (req, res) => {
   const mode = req.query["hub.mode"];
@@ -22,12 +24,26 @@ app.get("/webhook", (req, res) => {
 
 app.post("/webhook", (req, res) => {
   res.sendStatus(200);
-  const message = req.body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+  const change = req.body?.entry?.[0]?.changes?.[0];
+  const value = change?.value;
+
+  // Blessing typing in her phone app
+  if (change?.field === "smb_message_echoes") {
+    const echo = value?.message_echoes?.[0];
+    const cmd = echo?.text?.body?.trim().toLowerCase();
+    if (cmd === "#me") paused.add(echo.to);
+    if (cmd === "#bot") paused.delete(echo.to);
+    return;
+  }
+
+  const message = value?.messages?.[0];
   if (!message) return;
   const from = message.from;
+  if (paused.has(from)) return;
   const text = message.text?.body;
   console.log(`Message from ${from}: ${text}`);
-    if (message.type === "image") {
+
+  if (message.type === "image") {
     sendText(from, "Thank you! 📸 Payment screenshot received. Blessing will check and confirm your order shortly ❤️");
   } else if (text) {
     sendText(from, getReply(from, text));

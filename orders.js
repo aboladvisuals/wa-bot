@@ -60,6 +60,6 @@ Date: ${o.date}
 ${o.method}${o.postcode ? " – " + o.postcode : ""}
 
 ${business.owner} will confirm the total and availability shortly. Then pay by Revolut: ${business.revolut}
-Please use ${o.ref} as the reference. Full payment confirms your order.`;
+Please use ${o.ref} as the reference, then send a screenshot of your payment here 📸`;
   }
 }

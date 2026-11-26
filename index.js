@@ -47,8 +47,8 @@ app.post("/webhook", async (req, res) => {
   }
 
   const message = value?.messages?.[0];
-  if (message && seen.has(msg.id)) return;
-  if (message) { seen.add(msg.id); if (seen.size > 1000) seen.clear(); }
+  if (message && seen.has(message.id)) return;
+  if (message) { seen.add(message.id); if (seen.size > 1000) seen.clear(); }
   if (!message) return;
   const from = message.from;
   if (paused.has(from)) return;

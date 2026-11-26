@@ -10,7 +10,7 @@ If they say ok/alright/noted after payment details, acknowledge kindly and remin
 async function aiReply(text) {
   try {
     const res = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.8-flash",
       contents: text,
       config: { systemInstruction: system, maxOutputTokens: 200 },
     });

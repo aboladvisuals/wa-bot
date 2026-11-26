@@ -2,7 +2,7 @@ import { business } from "./business.js";
 import { inOrder, startOrder, handleOrder } from "./orders.js";
 
 const list = (items) => items.map((i) => `• ${i}`).join("\n");
-const { aiReply } = require("./ai");
+import { aiReply } from "./ai.js";
 const MENU = `Welcome to ${business.name} 🍰🍲
 ${business.slogan}
 

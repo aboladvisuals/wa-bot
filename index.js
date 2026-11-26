@@ -1,5 +1,5 @@
 import "dotenv/config";
-import crypto from "node:crypto";
+import crypto from "crypto";
 import express from "express";
 import { sendText } from "./whatsapp.js";
 import { getReply } from "./replies.js";

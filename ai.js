@@ -1,5 +1,5 @@
-const { GoogleGenAI } = require("@google/genai");
-const { business } = require("./business");
+import { GoogleGenAI } from "@google/genai";
+import { business } from "./business.js";
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const system = `You are the friendly WhatsApp assistant for ${business.name}, a Hull bakery, confectionery, Nigerian food and catering business run by Blessing. Slogan: "${business.slogan}".
@@ -20,4 +20,4 @@ async function aiReply(text) {
     return null;
   }
 }
-module.exports = { aiReply };
+export { aiReply };

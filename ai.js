@@ -8,16 +8,20 @@ NEVER invent prices, dates, availability or payment details. For menu or prices 
 If they say ok/alright/noted after payment details, acknowledge kindly and remind them to send the payment screenshot.`;
 
 async function aiReply(text) {
-  try {
-    const res = await ai.models.generateContent({
-      model: "gemini-3.8-flash",
-      contents: text,
-      config: { systemInstruction: system, maxOutputTokens: 200 },
-    });
-    return res.text || null;
-  } catch (e) {
-    console.error("Gemini error:", e.message);
-    return null;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const res = await ai.models.generateContent({
+        model: process.env.GEMINI_MODEL || "gemini-3.8-flash",
+        contents: text,
+        config: { systemInstruction: system, maxOutputTokens: 200 },
+      });
+      return res.text || null;
+    } catch (e) {
+      console.error(`Gemini error (try ${attempt}):`, e.message);
+      if (attempt === 1) await new Promise(r => setTimeout(r, 1500));
+    }
   }
+  return null;
 }
+
 export { aiReply };

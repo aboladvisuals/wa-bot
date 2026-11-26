@@ -2,7 +2,7 @@ import { business } from "./business.js";
 import { inOrder, startOrder, handleOrder } from "./orders.js";
 
 const list = (items) => items.map((i) => `• ${i}`).join("\n");
-
+const { aiReply } = require("./ai");
 const MENU = `Welcome to ${business.name} 🍰🍲
 ${business.slogan}
 
@@ -14,7 +14,7 @@ Reply with a number:
 5. How to order & pay
 6. Talk to ${business.owner}`;
 
-export function getReply(from, text) {
+export async function getReply(from, text) {
   const t = text.toLowerCase().trim();
     if (inOrder(from)) return handleOrder(from, text);
   if (t === "order" || t.includes("i want to order") || t.includes("place order")) return startOrder(from);
@@ -34,5 +34,5 @@ export function getReply(from, text) {
   if (t === "5" || t.includes("pay") || t.includes("order")) return `📝 Reply order to start, or send:\n• Item(s) and quantity\n• Date and time needed\n• Collection or delivery (with postcode)\n\nFull payment confirms your order.\nPay by Revolut: ${business.revolut}\nBank transfer details available on request.`;
   if (t === "6" || t.includes("blessing") || t.includes("person")) return `No problem 😊 ${business.owner} will reply to you personally soon.`;
 
-  return `Sorry, I didn't catch that 😊 Reply MENU to see options, or 6 to talk to ${business.owner}.`;
+  return (await aiReply(text)) || "Sorry, I didn't catch that 🙏 Type MENU to see options, or Blessing will reply soon.";
 }

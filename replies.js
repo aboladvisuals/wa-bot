@@ -20,6 +20,8 @@ export async function getReply(from, text) {
   if (t === "order" || t.includes("i want to order") || t.includes("place order")) return startOrder(from);
 
   // Friendly chat (friends & family)
+  if (/^(ok|okay|alright|alrigh|noted|sure|cool|fine|k)\b/i.test(text.trim()))
+  return "Great 👍 Once you've paid, just send the screenshot here and Blessing will confirm. Type MENU anytime.";
   if (/(thank you|thanks|thank u|tnx|e se)/.test(t)) return "You're welcome! ❤️ Anything else, just reply MENU.";
   if (/(how far|how are you|how you dey|good morning|good afternoon|good evening|god bless|amen)/.test(t)) {
     return `Hello! 😊 Thank you, we're doing well. Hope you're good too ❤️\nIf you need anything from ${business.name}, just reply MENU.`;

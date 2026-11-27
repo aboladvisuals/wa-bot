@@ -36,5 +36,6 @@ export async function getReply(from, text) {
   if (t === "5" || t.includes("pay") || t.includes("order")) return `📝 Reply order to start, or send:\n• Item(s) and quantity\n• Date and time needed\n• Collection or delivery (with postcode)\n\nFull payment confirms your order.\nPay by Revolut: ${business.revolut}\nBank transfer details available on request.`;
   if (t === "6" || t.includes("blessing") || t.includes("person")) return `No problem 😊 ${business.owner} will reply to you personally soon.`;
 
-  return (await aiReply(text)) || "Sorry, I didn't catch that 🙏 Type MENU to see options, or Blessing will reply soon.";
+  return (await aiReply(from, text)) || "Sorry, I didn't catch that 🙏 Type MENU to see options, or Blessing will reply soon.";
+
 }

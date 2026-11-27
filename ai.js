@@ -1,27 +1,32 @@
-import { GoogleGenAI } from "@google/genai";
+import OpenAI from "openai";
 import { business } from "./business.js";
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-const system = `You are the friendly WhatsApp assistant for ${business.name}, a Hull bakery, confectionery, Nigerian food and catering business run by Blessing. Slogan: "${business.slogan}".
-Reply warmly and briefly (1-3 sentences). You can use English, Yoruba or Pidgin to match the customer.
-NEVER invent prices, dates, availability or payment details. For menu or prices tell them to type MENU. To order, type ORDER. For anything you are unsure of, say Blessing will reply soon.
-If they say ok/alright/noted after payment details, acknowledge kindly and remind them to send the payment screenshot.`;
+const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const history = new Map(); // phone number -> recent messages
 
-async function aiReply(text) {
-  for (let attempt = 1; attempt <= 2; attempt++) {
-    try {
-      const res = await ai.models.generateContent({
-        model: process.env.GEMINI_MODEL || "gemini-3.8-flash",
-        contents: text,
-        config: { systemInstruction: system, maxOutputTokens: 200 },
-      });
-      return res.text || null;
-    } catch (e) {
-      console.error(`Gemini error (try ${attempt}):`, e.message);
-      if (attempt === 1) await new Promise(r => setTimeout(r, 1500));
-    }
+const SYSTEM = `You are the WhatsApp assistant for WHOIAM, Blessing's bakery, confectionery, Nigerian food and catering business in Hull. Slogan: "Made with Love, Served with Excellence".
+Talk like a friendly Nigerian woman texting a customer: warm, short (1-3 sentences), natural. Reply in the language they use: English, Pidgin or Yoruba.
+NEVER invent prices, dates, availability or payment details. For prices or ordering, tell them to type MENU or ORDER. If unsure, say Blessing will reply soon.
+Business info: ${JSON.stringify(business)}`;
+
+async function aiReply(from, text) {
+  const past = history.get(from) || [];
+  past.push({ role: "user", content: text });
+  try {
+    const res = await client.chat.completions.create({
+      model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+      max_tokens: 200,
+      temperature: 0.7,
+      messages: [{ role: "system", content: SYSTEM }, ...past.slice(-10)],
+    });
+    const reply = res.choices[0].message.content.trim();
+    past.push({ role: "assistant", content: reply });
+    history.set(from, past.slice(-10));
+    return reply;
+  } catch (err) {
+    console.error("OpenAI error:", err.message);
+    return null;
   }
-  return null;
 }
 
 export { aiReply };

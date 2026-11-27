@@ -1,8 +1,10 @@
 import { business } from "./business.js";
 import { inOrder, startOrder, handleOrder } from "./orders.js";
+import { inBooking, startBooking, handleBooking } from "./bookings.js";
+import { aiReply } from "./ai.js";
 
 const list = (items) => items.map((i) => `• ${i}`).join("\n");
-import { aiReply } from "./ai.js";
+
 const MENU = `Welcome to ${business.name} 🍰🍲
 ${business.slogan}
 
@@ -12,21 +14,29 @@ Reply with a number:
 3. Small chops
 4. Delivery & collection
 5. How to order & pay
-6. Talk to ${business.owner}`;
+6. Talk to ${business.owner}
+7. Catering & events 🎉`;
 
 export async function getReply(from, text) {
   const t = text.toLowerCase().trim();
-    if (inOrder(from)) return handleOrder(from, text);
+
+  // Active flows first
+  if (inBooking(from)) return handleBooking(from, text);
+  if (inOrder(from)) return handleOrder(from, text);
+
+  // Start flows
+  if (t === "7" || /^(book|booking|catering|event)\b/i.test(t)) return startBooking(from);
   if (t === "order" || t.includes("i want to order") || t.includes("place order")) return startOrder(from);
 
   // Friendly chat (friends & family)
-  if (/^(ok|okay|alright|alrigh|noted|sure|cool|fine|k)\b/i.test(text.trim()))
-  return "Great 👍 Once you've paid, just send the screenshot here and Blessing will confirm. Type MENU anytime.";
+  if (/^(ok|okay|alright|alrigh|noted|sure|cool|fine|k)\b/i.test(t))
+    return "Great 👍 Once you've paid, just send the screenshot here and Blessing will confirm. Type MENU anytime.";
   if (/(thank you|thanks|thank u|tnx|e se)/.test(t)) return "You're welcome! ❤️ Anything else, just reply MENU.";
   if (/(how far|how are you|how you dey|good morning|good afternoon|good evening|god bless|amen)/.test(t)) {
     return `Hello! 😊 Thank you, we're doing well. Hope you're good too ❤️\nIf you need anything from ${business.name}, just reply MENU.`;
   }
 
+  // Menu
   if (/^(hi|hello|hey|menu|start)$/.test(t)) return MENU;
 
   if (t === "1" || t.includes("cake")) return `🎂 Cakes\n${list(business.menu.cakes)}\n\nCustom cakes: book 7 days ahead. Wedding cakes: 3–4 weeks.`;
@@ -36,6 +46,6 @@ export async function getReply(from, text) {
   if (t === "5" || t.includes("pay") || t.includes("order")) return `📝 Reply order to start, or send:\n• Item(s) and quantity\n• Date and time needed\n• Collection or delivery (with postcode)\n\nFull payment confirms your order.\nPay by Revolut: ${business.revolut}\nBank transfer details available on request.`;
   if (t === "6" || t.includes("blessing") || t.includes("person")) return `No problem 😊 ${business.owner} will reply to you personally soon.`;
 
+  // Everything else -> AI
   return (await aiReply(from, text)) || "Sorry, I didn't catch that 🙏 Type MENU to see options, or Blessing will reply soon.";
-
 }

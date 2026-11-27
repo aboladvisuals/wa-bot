@@ -33,5 +33,10 @@ export const business = {
       "Chin chin: 350g from £8, 1kg from £20",
       "Small chops platter (~50) – from £50",
     ],
+
+    catering: [
+      "Parties, weddings, owambe & corporate events 🎉",
+      "Type BOOK to get a quote",
+    ],
   },
 };

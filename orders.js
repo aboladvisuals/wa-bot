@@ -1,4 +1,5 @@
 import { business } from "./business.js";
+import { saveOrder } from "./sheet.js";
 
 const sessions = new Map(); // phone number -> { step, order }
 
@@ -51,6 +52,7 @@ export function handleOrder(from, text) {
     s.order.name = t;
     s.order.ref = newRef();
     const o = s.order;
+    saveOrder({ phone: from, ref: o.ref, name: o.name, item: o.item, date: o.date, method: o.method, postcode: o.postcode || "" });
     sessions.delete(from);
     return `Thank you ${o.name}! ❤️ Here's your order:
 
